@@ -1,0 +1,21 @@
+Region,Country,Item_Type,Sales_Channel,Order_Priority,Units_Sold,Unit_Price,Unit_Cost,Total_Revenue,Total_Cost,Total_Profit
+North America,United States,Laptops,Online,High,420,1200.00,800.00,504000.00,336000.00,168000.00
+Europe,Germany,Smartphones,Offline,Medium,780,850.00,550.00,663000.00,429000.00,234000.00
+Asia,Japan,Smartphones,Online,High,950,850.00,550.00,807500.00,522500.00,285000.00
+Europe,France,Monitors,Online,Low,310,320.00,210.00,99200.00,65100.00,34100.00
+North America,Canada,Laptops,Offline,Medium,290,1200.00,800.00,348000.00,232000.00,116000.00
+Asia,India,Accessories,Online,High,1450,45.00,22.00,65250.00,31900.00,33350.00
+Asia,Singapore,Tablets,Online,Critical,510,550.00,360.00,280500.00,183600.00,96900.00
+Europe,United Kingdom,Laptops,Online,High,630,1200.00,800.00,756000.00,504000.00,252000.00
+North America,United States,Monitors,Offline,Low,410,320.00,210.00,131200.00,86100.00,45100.00
+Europe,Spain,Smartphones,Offline,Medium,540,850.00,550.00,459000.00,297000.00,162000.00
+Asia,Japan,Tablets,Offline,Low,380,550.00,360.00,209000.00,136800.00,72200.00
+North America,Mexico,Accessories,Online,Medium,890,45.00,22.00,40050.00,19580.00,20470.00
+Europe,Italy,Accessories,Offline,Low,620,45.00,22.00,27900.00,13640.00,14260.00
+Asia,India,Smartphones,Online,Critical,1200,850.00,550.00,1020000.00,660000.00,360000.00
+Europe,Germany,Laptops,Online,High,510,1200.00,800.00,612000.00,408000.00,204000.00
+North America,United States,Tablets,Offline,Medium,470,550.00,360.00,258500.00,169200.00,89300.00
+Asia,South Korea,Monitors,Online,High,720,320.00,210.00,230400.00,151200.00,79200.00
+Europe,Netherlands,Tablets,Online,Low,290,550.00,360.00,159500.00,104400.00,55100.00
+North America,Canada,Accessories,Offline,Medium,750,45.00,22.00,33750.00,16500.00,17250.00
+Asia,Singapore,Laptops,Online,Critical,390,1200.00,800.00,468000.00,312000.00,156000.00

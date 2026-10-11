@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Data Visualization Assistant | GenAI Internship Project</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons for dashboard UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- PapaParse for robust client-side CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <div class="brand-text">
+            <h2>DataViz AI</h2>
+            <span class="badge-intern">GenAI Internship</span>
+          </div>
+        </div>
+        <button class="mobile-toggle" id="sidebarCloseBtn" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <a href="#overview-section" class="nav-link active" data-section="overview-section">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Overview</span>
+        </a>
+        <a href="#chart-section" class="nav-link" data-section="chart-section">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Chart Studio</span>
+        </a>
+        <a href="#insights-section" class="nav-link" data-section="insights-section">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>Data Insights</span>
+        </a>
+        <a href="#stats-section" class="nav-link" data-section="stats-section">
+          <i class="fa-solid fa-calculator"></i>
+          <span>Column Statistics</span>
+        </a>
+        <a href="#table-section" class="nav-link" data-section="table-section">
+          <i class="fa-solid fa-table"></i>
+          <span>Data Table</span>
+        </a>
+      </nav>
+
+      <!-- Dataset Upload & Management Card -->
+      <div class="sidebar-card upload-card">
+        <div class="card-heading">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Dataset Source</span>
+        </div>
+        
+        <!-- File Input Drop Area -->
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" aria-label="Upload CSV File">
+          <i class="fa-solid fa-file-csv upload-icon"></i>
+          <p class="drop-text">Drag & drop your <strong>.CSV</strong> file here</p>
+          <span class="drop-subtext">or browse from computer</span>
+          <button type="button" class="btn btn-outline btn-sm browse-btn" onclick="document.getElementById('csvFileInput').click()">
+            <i class="fa-solid fa-folder-open"></i> Browse File
+          </button>
+        </div>
+
+        <!-- Sample Dataset Controls -->
+        <div class="sample-dataset-group">
+          <label for="sampleDatasetSelect" class="form-label">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Try Sample Data
+          </label>
+          <div class="sample-actions">
+            <select id="sampleDatasetSelect" class="form-select">
+              <option value="sales">Global Sales & Revenue (20 rows)</option>
+              <option value="employees">Tech Salaries & Roles (15 rows)</option>
+            </select>
+            <button type="button" id="loadSampleBtn" class="btn btn-primary btn-sm btn-block">
+              <i class="fa-solid fa-bolt"></i> Load Sample Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Active File Meta -->
+        <div class="active-file-meta" id="activeFileMeta" style="display: none;">
+          <div class="meta-item">
+            <i class="fa-solid fa-file-lines"></i>
+            <span id="activeFileName" class="truncate">dataset.csv</span>
+          </div>
+          <div class="meta-row">
+            <span id="activeFileSize">0 KB</span>
+            <button type="button" id="resetDataBtn" class="btn-text-danger" title="Clear current dataset">
+              <i class="fa-solid fa-trash-can"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="footer-info">
+          <p class="footer-title">AI Data Viz Assistant</p>
+          <p class="footer-sub">Internship Project &bull; 100% Client-side</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" id="sidebarOpenBtn" aria-label="Open Sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-group">
+            <h1 class="page-title">Interactive Data Studio</h1>
+            <p class="page-subtitle">Upload CSV &bull; Generate Charts &bull; Instant Algorithmic Insights</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="status-indicator" id="datasetStatusPill">
+            <span class="status-dot dot-idle"></span>
+            <span id="statusText">No dataset loaded</span>
+          </div>
+          
+          <button type="button" id="topLoadSampleBtn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-bolt"></i> Quick Sample
+          </button>
+
+          <button type="button" id="exportChartBtn" class="btn btn-outline btn-sm" disabled title="Generate and export chart as image">
+            <i class="fa-solid fa-download"></i> Export Chart
+          </button>
+        </div>
+      </header>
+
+      <!-- Alert Notification Area -->
+      <div class="alert-container" id="alertContainer" role="region" aria-live="polite"></div>
+
+      <!-- Main Dashboard Scrollable Container -->
+      <main class="content-container">
+
+        <!-- Empty State Hero (Visible before data is loaded) -->
+        <section class="hero-empty-state" id="emptyStateHero">
+          <div class="hero-card">
+            <div class="hero-icon-stack">
+              <div class="hero-icon-bubble bubble-1"><i class="fa-solid fa-chart-line"></i></div>
+              <div class="hero-icon-bubble bubble-2"><i class="fa-solid fa-brain"></i></div>
+              <div class="hero-icon-bubble bubble-3"><i class="fa-solid fa-chart-pie"></i></div>
+            </div>
+            <h2>Welcome to the AI Data Visualization Assistant</h2>
+            <p class="hero-desc">
+              Transform your raw CSV data into interactive visual charts and clear, automated 
+              insights in seconds. Designed for data analysts, business leads, and internship project reviews.
+            </p>
+            <div class="hero-features">
+              <div class="hero-feature-item">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Fast in-browser CSV parsing</span>
+              </div>
+              <div class="hero-feature-item">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Interactive Chart.js visualizations</span>
+              </div>
+              <div class="hero-feature-item">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Automated plain-English insights</span>
+              </div>
+            </div>
+            <div class="hero-cta-group">
+              <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('csvFileInput').click()">
+                <i class="fa-solid fa-upload"></i> Upload CSV File
+              </button>
+              <button type="button" class="btn btn-secondary btn-lg" id="heroSampleBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample Sales Data
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Active Dashboard (Visible when data is loaded) -->
+        <div class="dashboard-content" id="dashboardContent" style="display: none;">
+          
+          <!-- Section 1: KPI Stats Overview -->
+          <section class="section-container" id="overview-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-chart-simple"></i>
+                <h2>Dataset Overview</h2>
+              </div>
+              <span class="section-tag" id="overviewFileTag">sales_data.csv</span>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-icon icon-blue">
+                  <i class="fa-solid fa-table-rows"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Total Rows</span>
+                  <h3 class="kpi-value" id="kpiRows">0</h3>
+                  <span class="kpi-sub">Total records in dataset</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon icon-purple">
+                  <i class="fa-solid fa-table-columns"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Total Columns</span>
+                  <h3 class="kpi-value" id="kpiCols">0</h3>
+                  <span class="kpi-sub">Attributes / Dimensions</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon icon-emerald">
+                  <i class="fa-solid fa-hashtag"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Numeric Columns</span>
+                  <h3 class="kpi-value" id="kpiNumericCols">0</h3>
+                  <span class="kpi-sub">Quantitative values</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon icon-amber">
+                  <i class="fa-solid fa-font"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Categorical Columns</span>
+                  <h3 class="kpi-value" id="kpiCategoryCols">0</h3>
+                  <span class="kpi-sub">Text / Label features</span>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon icon-rose">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-label">Missing Cells</span>
+                  <h3 class="kpi-value" id="kpiMissingCells">0</h3>
+                  <span class="kpi-sub" id="kpiCompleteness">100% complete</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Chart Studio -->
+          <section class="section-container" id="chart-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-chart-column"></i>
+                <h2>Chart Studio</h2>
+              </div>
+              <div class="section-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="downloadChartBtn">
+                  <i class="fa-solid fa-camera"></i> Save Chart Image
+                </button>
+              </div>
+            </div>
+
+            <!-- Chart Configuration Controls Card -->
+            <div class="chart-studio-layout">
+              <div class="chart-controls-panel">
+                <h4 class="panel-subtitle">Configure Visualization</h4>
+
+                <div class="control-grid">
+                  <!-- Chart Type -->
+                  <div class="control-group">
+                    <label for="chartTypeSelect" class="form-label">Chart Type</label>
+                    <select id="chartTypeSelect" class="form-select">
+                      <option value="bar">Bar Chart (Vertical)</option>
+                      <option value="horizontalBar">Bar Chart (Horizontal)</option>
+                      <option value="line">Line Chart (Trend)</option>
+                      <option value="pie">Pie Chart (Proportions)</option>
+                      <option value="doughnut">Doughnut Chart (Share)</option>
+                    </select>
+                  </div>
+
+                  <!-- X-Axis Column -->
+                  <div class="control-group">
+                    <label for="xAxisSelect" class="form-label">X-Axis / Category</label>
+                    <select id="xAxisSelect" class="form-select"></select>
+                  </div>
+
+                  <!-- Y-Axis Column -->
+                  <div class="control-group">
+                    <label for="yAxisSelect" class="form-label">Y-Axis / Numeric Metric</label>
+                    <select id="yAxisSelect" class="form-select"></select>
+                  </div>
+
+                  <!-- Aggregation Method -->
+                  <div class="control-group">
+                    <label for="aggregationSelect" class="form-label">Aggregation Method</label>
+                    <select id="aggregationSelect" class="form-select">
+                      <option value="sum">Sum (Total)</option>
+                      <option value="mean">Average (Mean)</option>
+                      <option value="count">Count (Frequency)</option>
+                      <option value="max">Maximum</option>
+                      <option value="min">Minimum</option>
+                    </select>
+                  </div>
+
+                  <!-- Sorting -->
+                  <div class="control-group">
+                    <label for="sortOrderSelect" class="form-label">Order & Sort</label>
+                    <select id="sortOrderSelect" class="form-select">
+                      <option value="desc">Highest to Lowest (Desc)</option>
+                      <option value="asc">Lowest to Highest (Asc)</option>
+                      <option value="none">Dataset Order (Original)</option>
+                      <option value="alpha">Alphabetical (A-Z)</option>
+                    </select>
+                  </div>
+
+                  <!-- Top N Limit -->
+                  <div class="control-group">
+                    <label for="topNSelect" class="form-label">Show Categories</label>
+                    <select id="topNSelect" class="form-select">
+                      <option value="10">Top 10 items</option>
+                      <option value="5">Top 5 items</option>
+                      <option value="15">Top 15 items</option>
+                      <option value="25">Top 25 items</option>
+                      <option value="all">Show All</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Unsuitable Selection Alert/Tip Banner -->
+                <div class="chart-notice-banner" id="chartNoticeBanner" style="display: none;">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span id="chartNoticeText">Tip: Pie charts are most readable with 10 or fewer categories.</span>
+                </div>
+              </div>
+
+              <!-- Chart Canvas Viewport -->
+              <div class="chart-viewport-card">
+                <div class="chart-header-meta">
+                  <h3 id="renderedChartTitle">Visualization</h3>
+                  <span class="chart-badge" id="renderedChartBadge">Aggregated by Sum</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                  <canvas id="mainChartCanvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Automated Data Insights Engine -->
+          <section class="section-container" id="insights-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-lightbulb"></i>
+                <h2>Automated Data Insights</h2>
+              </div>
+              <div class="section-tag-badge">
+                <i class="fa-solid fa-microchip"></i> Transparent Algorithmic Intelligence
+              </div>
+            </div>
+
+            <p class="section-subtext">
+              These observations are automatically calculated from your data using statistical heuristics, distribution metrics, 
+              and trend variance. No fabricated text or hallucinated claims—pure factual interpretation.
+            </p>
+
+            <div class="insights-grid" id="insightsGrid">
+              <!-- Dynamically populated insight cards -->
+            </div>
+          </section>
+
+          <!-- Section 4: Column Statistics Matrix -->
+          <section class="section-container" id="stats-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-calculator"></i>
+                <h2>Numeric Column Statistics</h2>
+              </div>
+              <span class="section-subtext-inline">Key quantitative indicators computed automatically</span>
+            </div>
+
+            <div class="stats-table-wrapper">
+              <table class="modern-table stats-table" id="numericStatsTable">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Count</th>
+                    <th>Total Sum</th>
+                    <th>Mean (Average)</th>
+                    <th>Median</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Range</th>
+                    <th>Std. Deviation</th>
+                    <th>Nulls</th>
+                  </tr>
+                </thead>
+                <tbody id="numericStatsBody">
+                  <!-- Generated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Section 5: Data Table Explorer -->
+          <section class="section-container" id="table-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fa-solid fa-table"></i>
+                <h2>Dataset Explorer</h2>
+              </div>
+              
+              <div class="table-toolbar">
+                <div class="search-input-wrapper">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" id="tableSearchInput" class="table-search-input" placeholder="Search across all rows...">
+                  <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Clear search">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+
+                <div class="rows-per-page-select">
+                  <label for="rowsPerPageSelect">Rows:</label>
+                  <select id="rowsPerPageSelect" class="form-select select-inline">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="data-table-card">
+              <div class="table-responsive" id="dataTableContainer">
+                <table class="modern-table preview-table" id="datasetPreviewTable">
+                  <thead id="previewTableHead">
+                    <!-- Dynamic Headers with sort indicators -->
+                  </thead>
+                  <tbody id="previewTableBody">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Footer -->
+              <div class="table-pagination-footer">
+                <div class="pagination-info" id="paginationInfo">
+                  Showing 1 to 10 of 20 entries
+                </div>
+                
+                <div class="pagination-controls">
+                  <button type="button" class="btn btn-outline btn-xs" id="prevPageBtn" disabled>
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                  </button>
+                  <span class="page-badge" id="pageNumberBadge">Page 1 of 2</span>
+                  <button type="button" class="btn btn-outline btn-xs" id="nextPageBtn">
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div> <!-- /dashboard-content -->
+
+      </main>
+
+      <!-- App Footer -->
+      <footer class="app-footer">
+        <div class="footer-content">
+          <p>&copy; 2026 AI Data Visualization Assistant &bull; GenAI Internship Project</p>
+          <p class="footer-links">
+            Built with HTML5, CSS3, JavaScript, Chart.js &amp; PapaParse
+          </p>
+        </div>
+      </footer>
+
+    </div> <!-- /main-wrapper -->
+
+  </div> <!-- /app-layout -->
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>

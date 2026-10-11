@@ -1,0 +1,16 @@
+Employee_ID,Name,Department,Job_Title,Years_Experience,Monthly_Salary,Performance_Score,Projects_Completed,Remote_Status
+EMP101,Aarav Sharma,Engineering,Backend Developer,4,85000,4.6,12,Hybrid
+EMP102,Sophia Chen,Data Science,Data Analyst,2,68000,4.2,8,Remote
+EMP103,Marcus Vance,Product,Product Manager,7,115000,4.8,16,On-site
+EMP104,Elena Rostova,Engineering,Frontend Developer,3,75000,4.4,10,Hybrid
+EMP105,Devon Taylor,Marketing,Growth Marketer,5,72000,3.9,14,Remote
+EMP106,Priya Patel,Data Science,ML Engineer,5,108000,4.9,15,Hybrid
+EMP107,Lucas Silva,Sales,Account Executive,4,65000,4.1,22,Remote
+EMP108,Amara Okafor,Design,UI/UX Designer,3,70000,4.5,11,Hybrid
+EMP109,Liam O'Connor,Engineering,DevOps Engineer,6,98000,4.7,13,On-site
+EMP110,Yuki Tanaka,Product,Associate PM,2,62000,4.0,7,Remote
+EMP111,Fatima Al-Mansoor,Engineering,Backend Developer,5,92000,4.7,14,Hybrid
+EMP112,Noah Miller,Sales,Sales Director,9,135000,4.8,29,On-site
+EMP113,Chloe Martin,Marketing,Content Strategist,3,58000,3.8,9,Remote
+EMP114,Vikram Sethi,Data Science,Senior Data Scientist,8,128000,4.9,18,Hybrid
+EMP115,Isabella Rossi,Design,Lead Product Designer,6,96000,4.6,12,On-site
